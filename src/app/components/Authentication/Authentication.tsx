@@ -4,7 +4,7 @@ import { Avatar, Button } from 'antd'
 import styled from 'styled-components'
 
 import { auth } from '../../../../firebase-config'
-import { TodoContext } from '../../../contexts/TodoContext'
+import { ItemContext } from '../../../contexts/ItemContext'
 
 const AvatarStyled = styled(Avatar)`
   @media (min-width: 970px) {
@@ -19,7 +19,7 @@ const ButtonStyled = styled(Button)`
 `
 
 export default function Authentication (): JSX.Element {
-  const { user }: { user?: { photoURL: string } } = useContext(TodoContext) // TODO: Find right types, not ANY
+  const { user }: { user?: { photoURL: string } } = useContext(ItemContext)
 
   const googleProvider = new GoogleAuthProvider()
   const googleLogin = async (): Promise<void> => {

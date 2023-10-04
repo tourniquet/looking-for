@@ -1,60 +1,126 @@
-import { addDoc, Timestamp, serverTimestamp, FieldValue } from 'firebase/firestore'
-import { Button, DatePicker, Input, Space } from 'antd'
-import { Dayjs } from 'dayjs'
+import { addDoc, serverTimestamp } from 'firebase/firestore'
+import { Button, Input, Row } from 'antd'
 import { useContext, useState } from 'react'
-import styled from 'styled-components'
 
-import { TodoContext } from '../../../contexts/TodoContext'
+import { ItemContext } from '../../../contexts/ItemContext'
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 
-const ButtonStyled = styled(Button)`
-  border-bottom-right-radius: 0;
-`
-const InputStyled = styled(Input)`
-  border-bottom-left-radius: 0;
-`
+const storage = getStorage()
+
+const { TextArea } = Input
 
 export default function NewTodo (): JSX.Element {
-  const [todo, setTodo] = useState('')
-  const [date, setDate] = useState<Timestamp | FieldValue | undefined>()
-  const { user, todosCollectionRef, getTodos }: { user?: { uid: string }, todosCollectionRef?: any, getTodos?: any } = useContext(TodoContext) // TODO: Find right type, not ANY
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [file, setFile] = useState<File>()
+  // const [file, setFile] = useState<Blob | Uint8Array | ArrayBuffer>()
+  const [imageURL, setImageURL] = useState('')
+  const { user, itemsCollectionRef }: { user?: { uid: string }, itemsCollectionRef?: any } = useContext(ItemContext) // TODO: Find right type, not ANY
 
-  const createNewTodo = async (): Promise<void> => {
-    await addDoc(todosCollectionRef, {
-      todo,
-      createdAt: serverTimestamp(),
-      dueDate: date,
-      uid: user?.uid,
-      done: false
-    })
-    await getTodos(user?.uid)
-    setTodo('')
-  }
-
-  function getDate (value: Dayjs | null): void {
-    if (value?.isValid() !== undefined) {
-      const dueDate = JSON.stringify(value) !== '{}' ? Timestamp.fromMillis(value.valueOf()) : serverTimestamp()
-      setDate(dueDate)
+  function handleFileChange (event: React.ChangeEvent<HTMLInputElement>): void {
+    if (event.target.files !== null) {
+      setFile(event.target.files[0])
     }
   }
 
+  function handleFileUpload (): void {
+    // Create the file metadata
+    /** @type {any} */
+    const metadata = {
+      contentType: 'image/jpeg'
+    }
+
+    if (typeof file !== 'undefined') {
+      // Upload file and metadata to the object 'images/mountains.jpg'
+      const storageRef = ref(storage, `images/${file.name}`)
+      const uploadTask = uploadBytesResumable(storageRef, file, metadata)
+
+      // Listen for state changes, errors, and completion of the upload.
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          // console.log('Upload is ' + progress + '% done')
+          console.log(`Upload is ${progress} % done`)
+          switch (snapshot.state) {
+            case 'paused':
+              console.log('Upload is paused')
+              break
+            case 'running':
+              console.log('Upload is running')
+              break
+          }
+        },
+        (error) => {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          switch (error.code) {
+            case 'storage/unauthorized':
+              // User doesn't have permission to access the object
+              break
+            case 'storage/canceled':
+              // User canceled the upload
+              break
+            case 'storage/unknown':
+              // Unknown error occurred, inspect error.serverResponse
+              break
+          }
+        },
+        () => {
+          // Upload completed successfully, now we can get the download URL
+          getDownloadURL(uploadTask.snapshot.ref)
+            .then((downloadURL) => {
+              console.log('File available at', downloadURL)
+              setImageURL(downloadURL)
+            })
+            .catch((err) => console.log(err))
+        }
+      )
+    }
+  }
+
+  const createNewItem = async (): Promise<void> => {
+    await addDoc(itemsCollectionRef, {
+      title,
+      description,
+      createdAt: serverTimestamp(),
+      uid: user?.uid,
+      found: false,
+      image: imageURL
+    })
+    // await getTodos(user?.uid)
+    // setTitle('')
+    // setDescription('')
+  }
+
   return (
-    <Space.Compact style={{ width: '100%' }}>
-      <InputStyled
-        onChange={e => setTodo(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter') void createNewTodo() }}
-        placeholder='some text here...'
-        value={todo}
+    <Row style={{ marginBottom: '50px' }}>
+      <Input
+        disabled={user === null}
+        placeholder='Title'
+        onChange={e => setTitle(e.target.value)}
       />
 
-      {/* <DatePicker onChange={getDate} /> */}
+      <TextArea
+        disabled={user === null}
+        onChange={e => setDescription(e.target.value)}
+        style={{
+          resize: 'none',
+          marginTop: '20px',
+          marginBottom: '20px',
+          width: '100%',
+          height: '100px'
+        }}
+      />
 
-      <ButtonStyled
-        onClick={() => { void createNewTodo() }}
-        type='primary'
-        disabled={todo.length === 0}
-      >
-        Submit
-      </ButtonStyled>
-    </Space.Compact>
+      <input
+        disabled={user === null}
+        type='file'
+        onChange={handleFileChange}
+      />
+      <Button type='default' onClick={handleFileUpload}>Upload</Button>
+
+      <Button type='primary' onClick={() => { void createNewItem() }} disabled={imageURL.length === 0 && true}>Submit</Button>
+    </Row>
   )
 }

@@ -1,0 +1,11 @@
+.accordion {
+  border: none;
+}
+
+.accordion__button {
+  background-color: unset;
+}
+
+.accordion__button:hover {
+  background-color: #f8f9fa;
+}

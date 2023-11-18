@@ -3,19 +3,36 @@
 import { collection, getDocs, query, CollectionReference, Timestamp } from 'firebase/firestore' // where, orderBy,
 import React, { createContext, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
+import { User } from 'firebase/auth'
 
 import { auth, db } from '../../firebase-config'
 
 export const ItemContext = createContext({})
 
+interface Comments {
+  comment: string
+  uid: string
+}
 interface ItemsCollection {
-  done: boolean
-  todo: string
-  index: number
+  title: string
+  description: string
+  comments: Comments[]
+  image: string
+  uid: string
+  createdAt: Timestamp | undefined
+  found: boolean
 }
 
 interface ItemsProps extends ItemsCollection {
   id: string
+}
+
+export interface ItemContextType {
+  items: ItemsProps[]
+  setItems: React.Dispatch<React.SetStateAction<[]>>
+  user: User
+  getItems: Function
+  itemsCollectionRef: CollectionReference<ItemsCollection>
 }
 
 export function ItemProvider ({ children }: { children: React.ReactNode }): JSX.Element {

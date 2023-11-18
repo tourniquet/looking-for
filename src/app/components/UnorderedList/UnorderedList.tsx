@@ -11,33 +11,36 @@ import {
 import styled from 'styled-components'
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore'
 
-import { auth } from '../../../../firebase-config'
-import { ItemContext } from '@/contexts/ItemContext'
+// styles
+import 'react-accessible-accordion/dist/fancy-example.css'
+import './accordion.css'
 
-const UlStyled = styled.ul`
-  border-radius: 6px;
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
-  // border: 1px solid rgb(217, 217, 217);
-  border-top: 0px;
-  list-style: none;
-  margin-top: 0;
+import { auth, db } from '../../../../firebase-config'
+import { ItemContext, ItemContextType } from '@/contexts/ItemContext'
 
-  .ant-collapse-item:last-child {
-    border: none;
-  }
+const ItemDiv = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`
+const ItemDescription = styled.div`
+  padding: 0 10px 0 10px;
 `
 
-interface ItemProps {
-  uid: string
-  found: boolean
-  title: string
-  description: string
-  image: string
-}
-
 export default function UnorderedList (): JSX.Element {
-  const { items, getItems }: { items?: ItemProps[], getItems?: any } = useContext(ItemContext) // TODO: find right types
+  const { user, items, getItems } = useContext(ItemContext) as ItemContextType
+
+  const [comment, setComment] = useState('')
+
+  async function submitNewComment (id: string, comm: string): Promise<void> {
+    const comment = comm
+    const uid = user.uid
+
+    const docRef = doc(db, 'items', id)
+    await updateDoc(docRef, { comments: arrayUnion({ comment, uid }) })
+
+    setComment('')
+    getItems()
+  }
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -50,26 +53,54 @@ export default function UnorderedList (): JSX.Element {
   }, [])
 
   return (
-    <UlStyled>
-      <Accordion allowZeroExpanded>
-        {typeof items !== 'undefined' && items.map((item, index) => (
-          <AccordionItem key={index}>
-            <AccordionItemHeading>
-              <AccordionItemButton>
-                {item.title}
-              </AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel>
-              {item.description}
-              <img src={item.image} />
-              <Space.Compact style={{ width: '100%' }}>
-                <Input placeholder='Your comment here' />
-                <Button type='primary'>Submit</Button>
+    <Accordion allowZeroExpanded>
+      {typeof items !== 'undefined' && items.map((item, index) => (
+        <AccordionItem key={index}>
+          <AccordionItemHeading>
+            <AccordionItemButton>
+              {item.title}
+            </AccordionItemButton>
+          </AccordionItemHeading>
+          <AccordionItemPanel>
+            <ItemDiv>
+              <Image
+                src={item.image}
+                height={200}
+                width={200}
+                style={{ borderRadius: '6px' }}
+              />
+              <ItemDescription>
+                {item.description}
+              </ItemDescription>
+              <Space.Compact style={{ display: 'flex', flexWrap: 'wrap', width: '100%', padding: '10px 0 10px' }}>
+                <div className='comments'>
+                  {item.comments.length > 0 && item.comments.map((comment, index) => (
+                    <div key={index}>
+                      <p>{comment.comment}</p>
+                      {/* <p>{item.id}</p> */}
+                      {/* <p>{item.uid}</p> */}
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', width: '100%' }}>
+                  <Input
+                    value={comment}
+                    itemID={item.id}
+                    placeholder='Your comment here'
+                    onChange={el => setComment(el.target.value)}
+                  /> {/* TODO: comment id, user id */}
+                  <Button
+                    onClick={() => { void submitNewComment(item.id, comment) }}
+                    type='primary'
+                  >
+                    Submit
+                  </Button>
+                </div>
               </Space.Compact>
-            </AccordionItemPanel>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </UlStyled>
+            </ItemDiv>
+          </AccordionItemPanel>
+        </AccordionItem>
+      ))}
+    </Accordion>
   )
 }

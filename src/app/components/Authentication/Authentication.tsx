@@ -4,7 +4,7 @@ import { useContext } from 'react'
 import styled from 'styled-components'
 
 import { auth } from '../../../../firebase-config'
-import { ItemContext } from '../../../contexts/ItemContext'
+import { ItemContext, ItemContextType } from '../../../contexts/ItemContext'
 
 const AvatarStyled = styled(Avatar)`
   @media (min-width: 970px) {
@@ -19,7 +19,7 @@ const ButtonStyled = styled(Button)`
 `
 
 export default function Authentication (): JSX.Element {
-  const { user }: { user?: { photoURL: string } } = useContext(ItemContext)
+  const { user } = useContext(ItemContext) as ItemContextType
 
   const googleProvider = new GoogleAuthProvider()
   const googleLogin = async (): Promise<void> => {

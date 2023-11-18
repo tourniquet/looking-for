@@ -2,7 +2,7 @@ import { addDoc, serverTimestamp } from 'firebase/firestore'
 import { Button, Input, Row } from 'antd'
 import { useContext, useState } from 'react'
 
-import { ItemContext } from '../../../contexts/ItemContext'
+import { ItemContext, ItemContextType } from '../../../contexts/ItemContext'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 
 const storage = getStorage()
@@ -10,12 +10,13 @@ const storage = getStorage()
 const { TextArea } = Input
 
 export default function NewTodo (): JSX.Element {
+  const { getItems } = useContext(ItemContext) as ItemContextType
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [file, setFile] = useState<File>()
-  // const [file, setFile] = useState<Blob | Uint8Array | ArrayBuffer>()
   const [imageURL, setImageURL] = useState('')
-  const { user, itemsCollectionRef }: { user?: { uid: string }, itemsCollectionRef?: any } = useContext(ItemContext) // TODO: Find right type, not ANY
+  const { user, itemsCollectionRef } = useContext(ItemContext) as ItemContextType
 
   function handleFileChange (event: React.ChangeEvent<HTMLInputElement>): void {
     if (event.target.files !== null) {
@@ -84,10 +85,15 @@ export default function NewTodo (): JSX.Element {
       title,
       description,
       createdAt: serverTimestamp(),
-      uid: user?.uid,
+      uid: user.uid,
       found: false,
-      image: imageURL
+      image: imageURL,
+      comments: []
     })
+
+    setTitle('')
+    setDescription('')
+    getItems()
     // await getTodos(user?.uid)
     // setTitle('')
     // setDescription('')
@@ -99,11 +105,13 @@ export default function NewTodo (): JSX.Element {
         disabled={user === null}
         placeholder='Title'
         onChange={e => setTitle(e.target.value)}
+        value={title}
       />
 
       <TextArea
         disabled={user === null}
         onChange={e => setDescription(e.target.value)}
+        value={description}
         style={{
           resize: 'none',
           marginTop: '20px',
@@ -118,9 +126,12 @@ export default function NewTodo (): JSX.Element {
         type='file'
         onChange={handleFileChange}
       />
+
       <Button type='default' onClick={handleFileUpload}>Upload</Button>
 
-      <Button type='primary' onClick={() => { void createNewItem() }} disabled={imageURL.length === 0 && true}>Submit</Button>
+      <Button type='primary' onClick={() => { void createNewItem() }} disabled={imageURL.length === 0 && true}>
+        Submit
+      </Button>
     </Row>
   )
 }

@@ -1,7 +1,6 @@
 import { onAuthStateChanged } from 'firebase/auth'
-import React, { useContext, useEffect } from 'react'
-import styled from 'styled-components'
-import { Button, Input, Space } from 'antd'
+import React, { useContext, useEffect, useState } from 'react'
+import { Button, Image, Input, Space } from 'antd'
 import {
   Accordion,
   AccordionItem,
@@ -9,7 +8,8 @@ import {
   AccordionItemButton,
   AccordionItemPanel
 } from 'react-accessible-accordion'
-import 'react-accessible-accordion/dist/fancy-example.css'
+import styled from 'styled-components'
+import { doc, updateDoc, arrayUnion } from 'firebase/firestore'
 
 import { auth } from '../../../../firebase-config'
 import { ItemContext } from '@/contexts/ItemContext'

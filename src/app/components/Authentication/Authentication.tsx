@@ -1,6 +1,6 @@
+import { Avatar, Button } from 'antd'
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth'
 import { useContext } from 'react'
-import { Avatar, Button } from 'antd'
 import styled from 'styled-components'
 
 import { auth } from '../../../../firebase-config'

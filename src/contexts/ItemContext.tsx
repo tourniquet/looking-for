@@ -33,11 +33,14 @@ export interface ItemContextType {
   user: User
   getItems: Function
   itemsCollectionRef: CollectionReference<ItemsCollection>
+  comment: string
+  setComment: React.Dispatch<React.SetStateAction<string>>
 }
 
 export function ItemProvider ({ children }: { children: React.ReactNode }): JSX.Element {
   const [items, setItems] = useState<ItemsProps[]>([])
   const [user, loading] = useAuthState(auth)
+  const [comment, setComment] = useState('')
 
   const itemsCollectionRef = collection(db, 'items') as CollectionReference<ItemsCollection>
 
@@ -59,8 +62,10 @@ export function ItemProvider ({ children }: { children: React.ReactNode }): JSX.
     <ItemContext.Provider value={{
       user,
       items,
+      comment,
       itemsCollectionRef,
       setItems,
+      setComment,
       getItems
     }}
     >

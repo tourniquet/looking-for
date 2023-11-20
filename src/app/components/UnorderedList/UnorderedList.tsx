@@ -17,6 +17,7 @@ import './accordion.css'
 import { auth } from '../../../../firebase-config'
 import { ItemContext, ItemContextType } from '@/contexts/ItemContext'
 import NewComment from '../Comment/NewComment/NewComment'
+import DisplayComment from '../Comment/DisplayComment/DisplayComment'
 
 const ItemDiv = styled.div`
   display: flex;
@@ -60,14 +61,7 @@ export default function UnorderedList (): JSX.Element {
                 {item.description}
               </ItemDescription>
               <Space.Compact style={{ display: 'flex', flexWrap: 'wrap', width: '100%', padding: '10px 0 10px' }}>
-                <div className='comments'>
-                  {item.comments.length > 0 && item.comments.map((comment, index) => (
-                    <div key={index}>
-                      <p>{comment.comment}</p>
-                    </div>
-                  ))}
-                </div>
-
+                <DisplayComment itemObj={item} />
                 <NewComment id={item.id} />
               </Space.Compact>
             </ItemDiv>

@@ -13,7 +13,7 @@ interface Comments {
   comment: string
   uid: string
 }
-interface ItemsCollection {
+export interface ItemsCollection {
   title: string
   description: string
   comments: Comments[]
@@ -23,7 +23,7 @@ interface ItemsCollection {
   found: boolean
 }
 
-interface ItemsProps extends ItemsCollection {
+export interface ItemsProps extends ItemsCollection {
   id: string
 }
 

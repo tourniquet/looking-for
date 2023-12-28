@@ -33,6 +33,31 @@ const ItemDescription = styled.div`
   padding: 0 10px 0 10px;
 `
 
+const DescriptionBlock = styled.div`
+  background: grey;
+  display: flex;
+  padding: 10px;
+  width: 100%;
+`
+
+const ImageBlock = styled(Image)`
+  border-radius: 6px;
+`
+
+const CommentsBlock = styled(Space.Compact)`
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px 0 10px;
+  width: 100%;
+`
+
+const CommentsBlockHeading = styled.p`
+  margin-top: 15px;
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 10px;
+`
+
 export default function UnorderedList (): JSX.Element {
   const { items, getItems } = useContext(ItemContext) as ItemContextType
 
@@ -58,19 +83,23 @@ export default function UnorderedList (): JSX.Element {
 
           <AccordionItemPanel>
             <ItemDiv>
-              <Image
-                src={item.image}
-                height={200}
-                width={200}
-                style={{ borderRadius: '6px' }}
-              />
-              <ItemDescription>
-                {item.description}
-              </ItemDescription>
-              <Space.Compact style={{ display: 'flex', flexWrap: 'wrap', width: '100%', padding: '10px 0 10px' }}>
+              <DescriptionBlock>
+                <ImageBlock
+                  src={item.image}
+                  height={200}
+                  width={200}
+                />
+
+                <ItemDescription className='item-description'>
+                  {item.description}
+                </ItemDescription>
+              </DescriptionBlock>
+
+              <CommentsBlock>
+                <CommentsBlockHeading>Comments:</CommentsBlockHeading>
                 <DisplayComment itemObj={item} />
                 <NewComment id={item.id} />
-              </Space.Compact>
+              </CommentsBlock>
             </ItemDiv>
           </AccordionItemPanel>
         </AccordionItem>

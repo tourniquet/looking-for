@@ -4,8 +4,21 @@
 
 .accordion__button {
   background-color: unset;
+
+  &:hover {
+    background-color: #f8f9fa;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+
+  &:before {
+    height: 5px;
+    width: 5px;
+  }
 }
 
 .accordion__button:hover {
-  background-color: #f8f9fa;
+  /* background-color: #f8f9fa;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px; */
 }

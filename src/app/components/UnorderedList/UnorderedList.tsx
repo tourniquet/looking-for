@@ -16,8 +16,14 @@ import './accordion.css'
 
 import { auth } from '../../../../firebase-config'
 import { ItemContext, ItemContextType } from '@/contexts/ItemContext'
+
 import NewComment from '../Comment/NewComment/NewComment'
 import DisplayComment from '../Comment/DisplayComment/DisplayComment'
+
+const AccordionStyled = styled(Accordion)`
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+`
 
 const ItemDiv = styled.div`
   display: flex;
@@ -41,7 +47,7 @@ export default function UnorderedList (): JSX.Element {
   }, [])
 
   return (
-    <Accordion allowZeroExpanded>
+    <AccordionStyled allowZeroExpanded>
       {typeof items !== 'undefined' && items.map((item, index) => (
         <AccordionItem key={index}>
           <AccordionItemHeading>
@@ -49,6 +55,7 @@ export default function UnorderedList (): JSX.Element {
               {item.title}
             </AccordionItemButton>
           </AccordionItemHeading>
+
           <AccordionItemPanel>
             <ItemDiv>
               <Image
@@ -68,6 +75,6 @@ export default function UnorderedList (): JSX.Element {
           </AccordionItemPanel>
         </AccordionItem>
       ))}
-    </Accordion>
+    </AccordionStyled>
   )
 }

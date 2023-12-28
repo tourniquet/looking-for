@@ -21,12 +21,14 @@ export default function NewComment ({ id }: { id: string }): JSX.Element {
   return (
     <div style={{ display: 'flex', width: '100%' }}>
       <Input
+        disabled={user === null}
         value={comment}
         itemID={id}
         placeholder='Your comment here'
         onChange={el => setComment(el.target.value)}
       />
       <Button
+        disabled={user === null}
         onClick={() => { void submitNewComment(id, comment) }}
         type='primary'
       >

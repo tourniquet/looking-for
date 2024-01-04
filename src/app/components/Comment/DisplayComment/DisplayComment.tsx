@@ -17,12 +17,16 @@ const LItemStyled = styled.li`
   }
 `
 
+const UserName = styled.i`
+  color: rgba(0, 0, 0, 0.5);
+`
+
 export default function DisplayComment ({ itemObj }: { itemObj: ItemsCollection }): JSX.Element {
   return (
     <ULStyled className='comments'>
       {itemObj.comments.length > 0 && itemObj.comments.map((comment, index) => (
         <LItemStyled key={index}>
-          <p>{comment.comment}</p>
+          <p><UserName>@{comment.userName}:</UserName> {comment.comment}</p>
         </LItemStyled>
       ))}
     </ULStyled>

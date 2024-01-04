@@ -23,9 +23,10 @@ export default function NewComment ({ id }: { id: string }): JSX.Element {
 
   async function submitNewComment (id: string, comment: string): Promise<void> {
     const uid = user.uid
+    const userName = user.displayName
 
     const docRef = doc(db, 'items', id)
-    await updateDoc(docRef, { comments: arrayUnion({ comment, uid }) })
+    await updateDoc(docRef, { comments: arrayUnion({ comment, uid, userName }) })
 
     setComment('')
     getItems()

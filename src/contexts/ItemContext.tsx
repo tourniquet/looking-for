@@ -10,6 +10,7 @@ import { auth, db } from '../../firebase-config'
 export const ItemContext = createContext({})
 
 interface Comments {
+  userName: string
   comment: string
   uid: string
 }
